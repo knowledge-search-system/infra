@@ -65,6 +65,54 @@ services:
     networks:
       - knowledge-search-network
 
+  search-engine:
+    build:
+      context: ../search-engine
+      dockerfile: Dockerfile
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_started
+
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+
+    networks:
+      - knowledge-search-network
+
+  document-processor:
+    build:
+      context: ../document-processor
+      dockerfile: Dockerfile
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      search-engine:
+        condition: service_started
+
+    ports:
+      - "8081:8081"
+      - "9091:9091"
+
+    networks:
+      - knowledge-search-network
+
 networks:
   knowledge-search-network:
     driver: bridge
