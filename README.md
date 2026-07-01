@@ -10,10 +10,12 @@ frontend
 
 ml-service
 
+gateaway
+
 ## Local запуск
 
-docker compose up
+docker compose -f compose/docker-compose.dev.yml up -d --build
 
 ## Production
 
-docker compose -f compose/docker-compose.prod.yml up
+docker compose -f compose/docker-compose.prod.yml up --build
