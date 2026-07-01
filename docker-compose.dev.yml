@@ -65,6 +65,31 @@ services:
     networks:
       - knowledge-search-network
 
+  search-engine-migrate:
+    image: gomicro/goose:3.25.0
+
+    restart: "no"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    entrypoint: [ "/migrate.sh" ]
+
+    env_file:
+      - .env
+
+    environment:
+      DATABASE_DSN: ${SEARCH_ENGINE_POSTGRES_DSN}
+      MIGRATIONS_DIR: /migrations
+
+    volumes:
+      - ./docker/goose/migrate.sh:/migrate.sh:ro
+      - ../search-engine/migrations:/migrations:ro
+
+    networks:
+      - knowledge-search-network
+
   search-engine:
     build:
       context: ../search-engine
@@ -76,8 +101,8 @@ services:
       - .env
 
     depends_on:
-      postgres:
-        condition: service_healthy
+      search-engine-migrate:
+        condition: service_completed_successfully
       redis:
         condition: service_healthy
       elasticsearch:
@@ -86,6 +111,31 @@ services:
     ports:
       - "8080:8080"
       - "9090:9090"
+
+    networks:
+      - knowledge-search-network
+
+  document-processor-migrate:
+    image: gomicro/goose:3.25.0
+
+    restart: "no"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    entrypoint: [ "/migrate.sh" ]
+
+    env_file:
+      - .env
+
+    environment:
+      DATABASE_DSN: ${DOCUMENT_PROCESSOR_POSTGRES_DSN}
+      MIGRATIONS_DIR: /migrations
+
+    volumes:
+      - ./docker/goose/migrate.sh:/migrate.sh:ro
+      - ../search-engine/migrations:/migrations:ro
 
     networks:
       - knowledge-search-network
@@ -101,8 +151,8 @@ services:
       - .env
 
     depends_on:
-      postgres:
-        condition: service_healthy
+      document-processor-migrate:
+        condition: service_completed_successfully
       search-engine:
         condition: service_started
 
