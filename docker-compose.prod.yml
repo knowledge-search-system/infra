@@ -57,7 +57,7 @@ services:
       - knowledge-search-network
 
   search-engine-migrate:
-    image: ghcr.io/knowledge-search-system/search-engine-migrate:latest
+    image: ghcr.io/knowledge-search-system/search-engine-migrate:main
 
     restart: "no"
 
@@ -72,12 +72,12 @@ services:
       - knowledge-search-network
 
   search-engine:
-    image: ghcr.io/knowledge-search-system/search-engine:latest
+    image: ghcr.io/knowledge-search-system/search-engine:main
 
     restart: unless-stopped
 
     env_file:
-      - .env.prod
+      - .env
 
     depends_on:
       search-engine-migrate:
@@ -94,7 +94,7 @@ services:
       - knowledge-search-network
 
   document-processor-migrate:
-    image: ghcr.io/knowledge-search-system/document-processor-migrate:latest
+    image: ghcr.io/knowledge-search-system/document-processor-migrate:main
 
     restart: "no"
 
@@ -109,12 +109,12 @@ services:
       - knowledge-search-network
 
   document-processor:
-    image: ghcr.io/knowledge-search-system/document-processor:latest
+    image: ghcr.io/knowledge-search-system/document-processor:main
 
     restart: unless-stopped
 
     env_file:
-      - .env.prod
+      - .env
 
     depends_on:
       document-processor-migrate:
