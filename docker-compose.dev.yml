@@ -66,7 +66,9 @@ services:
       - knowledge-search-network
 
   search-engine-migrate:
-    image: gomicro/goose:3.25.0
+    build:
+      context: ../search-engine
+      dockerfile: Dockerfile.migrate
 
     restart: "no"
 
@@ -74,18 +76,8 @@ services:
       postgres:
         condition: service_healthy
 
-    entrypoint: [ "/migrate.sh" ]
-
-    env_file:
-      - .env
-
     environment:
       DATABASE_DSN: ${SEARCH_ENGINE_POSTGRES_DSN}
-      MIGRATIONS_DIR: /migrations
-
-    volumes:
-      - ./docker/goose/migrate.sh:/migrate.sh:ro
-      - ../search-engine/migrations:/migrations:ro
 
     networks:
       - knowledge-search-network
@@ -116,7 +108,9 @@ services:
       - knowledge-search-network
 
   document-processor-migrate:
-    image: gomicro/goose:3.25.0
+    build:
+      context: ../document-processor
+      dockerfile: Dockerfile.migrate
 
     restart: "no"
 
@@ -124,18 +118,8 @@ services:
       postgres:
         condition: service_healthy
 
-    entrypoint: [ "/migrate.sh" ]
-
-    env_file:
-      - .env
-
     environment:
       DATABASE_DSN: ${DOCUMENT_PROCESSOR_POSTGRES_DSN}
-      MIGRATIONS_DIR: /migrations
-
-    volumes:
-      - ./docker/goose/migrate.sh:/migrate.sh:ro
-      - ../search-engine/migrations:/migrations:ro
 
     networks:
       - knowledge-search-network
