@@ -12,10 +12,14 @@ ml-service
 
 gateaway
 
-## Local запуск
+## Start development environment
 
-docker compose -f compose/docker-compose.dev.yml up -d --build
+docker compose -f docker-compose.dev.yml up --build -d
 
-## Production
+## Stop
 
-docker compose -f compose/docker-compose.prod.yml up --build
+docker compose -f docker-compose.dev.yml down
+
+## Full reset
+
+docker compose -f docker-compose.dev.yml down -v
