@@ -129,7 +129,7 @@ services:
       - knowledge-search-network
 
   ml-service-migrate:
-    image: ghcr.io/knowledge-search-system/ml-service-migrate:main
+    image: ghcr.io/knowledge-search-system/ml-serivce-migrate:main
 
     restart: "no"
 
@@ -144,7 +144,7 @@ services:
       - knowledge-search-network
 
   ml-service:
-    image: ghcr.io/knowledge-search-system/ml-service:main
+    image: ghcr.io/knowledge-search-system/ml-serivce:main
 
     restart: unless-stopped
 
