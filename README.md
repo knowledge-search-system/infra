@@ -1,25 +1,143 @@
-# Knowledge Search System
+# Knowledge Search System — Infrastructure
 
-## Services
+Инфраструктурный репозиторий
 
-search-engine
+Содержит конфигурацию окружений, Docker Compose, автоматический деплой и вспомогательные файлы для запуска всей системы.
 
-document-processor
+---
 
-frontend
+## Состав системы
 
-ml-service
+| Сервис | Назначение |
+|--------|------------|
+| PostgreSQL + pgvector | Основная база данных |
+| Redis | Кэширование |
+| Elasticsearch | Полнотекстовый поиск |
+| Search Engine | Сервис поиска |
+| Document Processor | Обработка документов |
+| ML Service | Семантический поиск (RAG) |
+| Gateway | Единая REST API точка входа |
+| Frontend | Пользовательский интерфейс |
 
-gateaway
+---
 
-## Start development environment
+## Структура репозитория
 
-docker compose -f docker-compose.dev.yml up --build -d
+```
+.
+├── .github/
+│   └── workflows/
+├── docker/
+│   └── postgres/
+│       └── init/
+├── scripts/
+├── docker-compose.dev.yml
+├── docker-compose.prod.yml
+└── README.md
+```
 
-## Stop
+---
 
+## Локальный запуск
+
+Запуск окружения разработки:
+
+```bash
+docker compose -f docker-compose.dev.yml up -d
+```
+
+Остановка:
+
+```bash
 docker compose -f docker-compose.dev.yml down
+```
 
-## Full reset
+---
 
-docker compose -f docker-compose.dev.yml down -v
+## Production
+
+Запуск production-окружения:
+
+```bash
+docker compose -f docker-compose.prod.yml pull
+docker compose -f docker-compose.prod.yml up -d
+```
+
+---
+
+## Переменные окружения
+
+Конфигурация приложения хранится в файле
+
+```text
+.env
+```
+
+Пример конфигурации:
+
+```text
+.env.example
+```
+
+---
+
+## CI/CD
+
+Каждый микросервис содержит собственные пайплайны GitHub Actions.
+
+При пуше в ветку **main**:
+
+1. Выполняются проверки проекта.
+2. Собирается Docker-образ.
+3. Образ публикуется в GitHub Container Registry (GHCR).
+4. Отправляется событие `repository_dispatch` в данный репозиторий.
+5. GitHub Actions автоматически обновляет сервисы на production-сервере.
+
+Таким образом деплой выполняется полностью автоматически после успешного пуша.
+
+---
+
+## Используемые технологии
+
+- Docker
+- Docker Compose
+- GitHub Actions
+- GitHub Container Registry (GHCR)
+- PostgreSQL + pgvector
+- Redis
+- Elasticsearch
+
+---
+
+## Архитектура
+
+```
+                    Интернет
+                        │
+                        ▼
+                 ┌─────────────┐
+                 │  Frontend   │
+                 │    Nginx    │
+                 └──────┬──────┘
+                        │
+                    /api/*
+                        │
+                        ▼
+                 ┌─────────────┐
+                 │   Gateway   │
+                 └──────┬──────┘
+                        │
+        ┌───────────────┼────────────────┐
+        ▼               ▼                ▼
+ Search Engine   Document Processor   ML Service
+        │               │                │
+        └───────────────┴────────────────┘
+                        │
+      PostgreSQL • Redis • Elasticsearch
+```
+
+---
+
+## Авторы
+
+Проект разработан в рамках учебной практики по программной инженерии.
