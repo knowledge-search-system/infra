@@ -1,7 +1,7 @@
 services:
 
   postgres:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
 
     restart: unless-stopped
 
@@ -124,6 +124,36 @@ services:
 
     ports:
       - "8081:8081"
+
+    networks:
+      - knowledge-search-network
+
+  ml-service-migrate:
+    image: ghcr.io/knowledge-search-system/ml-service-migrate:main
+
+    restart: "no"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      ML_SERVICE_POSTGRES_DSN: ${ML_SERVICE_POSTGRES_DSN}
+
+    networks:
+      - knowledge-search-network
+
+  ml-service:
+    image: ghcr.io/knowledge-search-system/ml-service:main
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    depends_on:
+      ml-service-migrate:
+        condition: service_completed_successfully
 
     networks:
       - knowledge-search-network
