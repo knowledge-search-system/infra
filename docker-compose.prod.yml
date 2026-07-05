@@ -180,6 +180,24 @@ services:
     networks:
       - knowledge-search-network
 
+  frontend:
+    image: ghcr.io/knowledge-search-system/frontend:main
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    depends_on:
+      gateway:
+        condition: service_started
+
+    ports:
+      - "80:80"
+
+    networks:
+      - knowledge-search-network
+
 networks:
   knowledge-search-network:
     driver: bridge
