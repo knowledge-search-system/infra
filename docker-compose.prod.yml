@@ -158,6 +158,28 @@ services:
     networks:
       - knowledge-search-network
 
+  gateway:
+    image: ghcr.io/knowledge-search-system/gateway:main
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    depends_on:
+      document-processor:
+        condition: service_started
+      search-engine:
+        condition: service_started
+      ml-service:
+        condition: service_started
+
+    ports:
+      - "8082:8082"
+
+    networks:
+      - knowledge-search-network
+
 networks:
   knowledge-search-network:
     driver: bridge
